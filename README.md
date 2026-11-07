@@ -74,7 +74,7 @@ zurilofts/
 ├── postcss.config.js       # PostCSS configuration
 ├── vite.config.js          # Vite configuration
 ├── package.json            # Dependencies
-├── DESIGN.md               # Design system documentation
+├── design.md               # Design system documentation
 └── README.md               # This file
 ```
 
@@ -195,7 +195,7 @@ Multi-column footer with navigation, contact info, and social links.
 
 ## Design System
 
-See [`DESIGN.md`](DESIGN.md) for comprehensive design documentation including:
+See [`design.md`](design.md) for comprehensive design documentation including:
 - Brand colors and usage rules
 - Typography scale
 - Spacing system
@@ -316,7 +316,7 @@ daisyui: {
 
 ## Contributing
 
-1. Follow the design system in [`DESIGN.md`](DESIGN.md)
+1. Follow the design system in [`design.md`](design.md)
 2. Use existing component patterns for consistency
 3. Ensure responsive behavior across breakpoints
 4. Add PropTypes for new components

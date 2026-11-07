@@ -16,7 +16,7 @@ function tabClassName(isActive) {
 /**
  * Shared Inbox / Support tabs for the two message surfaces. Keeps the
  * existing /inbox and /messages URLs and deep links unchanged - this is
- * purely a navigation affordance between them, per design2.md G5.
+ * purely a navigation affordance between them.
  */
 function MessagesTabBar({ active }) {
   const { t } = useLanguage();

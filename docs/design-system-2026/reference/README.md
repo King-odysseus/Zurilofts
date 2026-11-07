@@ -14,8 +14,8 @@ checked against their source.
 | `contact-sheet.html` | Grid of the photos above, for picking which image goes on which board |
 
 The two `.webp` files are screenshots of Airbnb's public host pages, kept as
-visual reference only. `airbnb-language.md` records what each one contributed
-and links to the live pages.
+visual reference only. `design.md` at the repository root records what each one
+contributed and links to the live pages.
 
 ## Adding your own
 

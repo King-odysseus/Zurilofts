@@ -21,7 +21,7 @@ through ZuriLofts' own visual language and tailored to the Kenyan market.
 
 ### Component Patterns We Own
 
-- **Neumorphic cards** (`.neu-card`, `.neu-card-hover`) - legacy soft raised surfaces with layered `box-shadow` on white backgrounds. Still used in some existing components (`BookingSummaryCard`, `NearbySection`, `ChatWidget`). New components use flat Tailwind shadows (`shadow-md`, `shadow-lg`) per DESIGN.md. Full migration pending.
+- **Neumorphic cards** (`.neu-card`, `.neu-card-hover`) - legacy soft raised surfaces with layered `box-shadow` on white backgrounds. Still used in some existing components (`BookingSummaryCard`, `NearbySection`, `ChatWidget`). New components use flat Tailwind shadows (`shadow-md`, `shadow-lg`) per design.md. Full migration pending.
 - **Pill CTAs** - `rounded-full` bronze background with white text (`bg-[#C49A6C] text-white`) for primary actions; white background with navy border/text for secondary (`border-2 border-[#0B0B45] text-[#0B0B45]`). Never square-cornered buttons.
 - **Bronze as the sole action colour** - never used as a large background fill.
   Reserved for interactive elements: buttons, icons, rating stars, active states,
@@ -79,7 +79,7 @@ These are implemented, tested, and ready to compose into new phases without refa
 | Booking flow + Paystack         | `server/src/controllers/booking.controller.ts` | Create, confirm, webhook, cancel - extend for add-ons line items |
 | Favourites                      | `server/src/routes/favorite.routes.ts`    | Pattern to follow for shortlists; same user-scoped CRUD shape |
 | Admin dashboard shell           | `src/pages/AdminDashboard.jsx`            | Collapsible sidebar, Outlet-based routing, role-gated - reuse for host workspace |
-| Neumorphic + flat shadows | `src/index.css` (`.neu-card` etc. coexist with Tailwind `shadow-md/lg`) | Targeted removal planned. New components prefer flat Tailwind shadows per DESIGN.md; existing `.neu-*` classes remain for backward compat until full migration. |
+| Neumorphic + flat shadows | `src/index.css` (`.neu-card` etc. coexist with Tailwind `shadow-md/lg`) | Targeted removal planned. New components prefer flat Tailwind shadows per design.md; existing `.neu-*` classes remain for backward compat until full migration. |
 | Dropdown component              | `src/components/Dropdown.jsx`             | All filter/sort controls use this instead of native `<select>` |
 | Spinner + loading states        | `src/components/Spinner.jsx`              | Consistent loading UX across all async pages |
 | NearbySection component         | `src/components/NearbySection.jsx`        | Reuse on property page, trip hub, and booking confirmation |

@@ -47,7 +47,7 @@ export default {
         muted:          'rgb(var(--ds-muted) / <alpha-value>)',
         'cool-grey':    'rgb(var(--ds-muted) / <alpha-value>)',
         border:         'rgb(var(--ds-line) / <alpha-value>)',
-        // Design system 2026 (docs/design-system-2026/airbnb-language.md).
+        // Design system 2026 names, documented in design.md.
         // Guest pages are being moved onto these names; `ink` is the heading
         // colour and `line` the only divider grey, so a page that uses them
         // cannot drift back to navy headings or a second border tint.

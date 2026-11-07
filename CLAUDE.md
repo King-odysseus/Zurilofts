@@ -61,7 +61,7 @@ server/               # Express + Prisma backend
 
 ## Design System
 
-**Source:** [DESIGN.md](DESIGN.md) and the brain's `ZuriLofts design system` pattern (recall it before UI work).
+**Source:** [design.md](design.md) and the brain's `ZuriLofts design system` pattern (recall it before UI work).
 
 **Core colors (use arbitrary hex, per file convention):**
 - `#143A80` Brand Navy - the only button/CTA fill, active tabs, selected states, links, focus rings, and the brand ink for headings (white type on it still passes AAA)
