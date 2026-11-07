@@ -4,6 +4,7 @@ import path from 'path';
 import fs from 'fs';
 import { env } from '../config/env.js';
 import { AppError } from '../types/index.js';
+import { isChatAttachmentFilename } from './chatAttachment.js';
 
 // Local fallback directory - used only when Cloudinary is NOT configured
 // (e.g. local development). In production on Railway the filesystem is
@@ -37,6 +38,20 @@ function storageUnavailable(error: unknown): AppError {
   return new AppError('Photo storage is unavailable right now. Please try again in a moment.', 503);
 }
 
+/**
+ * How Cloudinary may deliver a stored file.
+ *
+ * Conversation attachments belong to a private thread, so they are stored as
+ * "authenticated" assets: Cloudinary refuses a plain address for them and only
+ * serves the signed one it returned at upload, which stays on the server. Our
+ * authenticated message route fetches that signed address and streams the bytes
+ * to people in the thread. Everything else (listing photos, avatars) is rendered
+ * by the public site and stays an ordinary public upload.
+ */
+export function cloudinaryDeliveryType(assetName: string): 'upload' | 'authenticated' {
+  return isChatAttachmentFilename(assetName) ? 'authenticated' : 'upload';
+}
+
 async function uploadToCloudinary(
   buffer: Buffer,
   options: { resource_type: 'image' | 'raw'; format?: string },
@@ -45,8 +60,9 @@ async function uploadToCloudinary(
   try {
     return await new Promise<{ secure_url: string }>((resolve, reject) => {
       cloudinary.uploader
-        .upload_stream({ folder: CLOUD_FOLDER, public_id: publicId, ...options }, (err, res) =>
-          err || !res ? reject(err ?? new Error('Cloudinary upload failed')) : resolve(res)
+        .upload_stream(
+          { folder: CLOUD_FOLDER, public_id: publicId, type: cloudinaryDeliveryType(publicId), ...options },
+          (err, res) => (err || !res ? reject(err ?? new Error('Cloudinary upload failed')) : resolve(res)),
         )
         .end(buffer);
     });
