@@ -11,7 +11,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
-import { googleStateMatches } from '../src/controllers/auth.controller.js';
+import { googleStateMatches } from '../src/utils/googleOAuthStore.js';
 
 const ISSUED = 'kZ8r2QpLw3nH7tYvB1cX4mN6aS9dF0gJ5hK2lM8pQ3r';
 
