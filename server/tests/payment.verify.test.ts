@@ -85,7 +85,7 @@ test('rejects a transaction whose status is not success', () => {
 test('a not-success rejection carries the real provider status, e.g. "pending"', () => {
   // The client needs this to tell a payment still processing apart from one
   // that actually failed - PaymentCallback.jsx must not label the former
-  // "Failed" (design2.md G6: distinct pending/failure states).
+  // "Failed"; pending and failed must stay distinct states.
   const r = checkVerifiedPayment(base({ status: 'pending' }));
   assert.equal(r.ok, false);
   assert.equal((r as { providerStatus: string }).providerStatus, 'pending');
