@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import * as paymentService from '../services/payment.service.js';
 import * as bookingService from '../services/booking.service.js';
+import { assertApprovedForPayment } from '../services/identity-verification.service.js';
 
 /** POST /api/payments/initialize - auth required */
 export async function initialize(req: Request, res: Response, next: NextFunction): Promise<void> {
@@ -38,6 +39,12 @@ export async function initialize(req: Request, res: Response, next: NextFunction
     if (ageGate !== 'OK') {
       res.status(ageGate === 'UNDER_AGE' ? 403 : 422).json({ success: false, error: ageGate });
       return;
+    }
+
+    // Same identity rule as POST /bookings/:id/payment (admins are exempt there too).
+    // Throws a 403 IDENTITY_VERIFICATION_REQUIRED that the error handler returns.
+    if (req.user!.role !== 'ADMIN') {
+      await assertApprovedForPayment(req.user!.sub);
     }
 
     const result = await paymentService.initializeBookingPayment(booking);
